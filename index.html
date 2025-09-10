@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz Literário — Gravar respostas no GitHub</title>
+  <style>
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:18px;background:#f5f7fa;color:#0b1220}
+    .container{max-width:880px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 6px 18px rgba(8,10,20,0.08)}
+    h1{margin-top:0}
+    .row{display:flex;gap:12px}
+    label{display:block;margin:6px 0}
+    .question{padding:12px;border-radius:6px;background:#fbfdff;margin-bottom:10px}
+    .actions{margin-top:12px}
+    button{padding:10px 14px;border-radius:6px;border:0;background:#2dd4bf;color:#043236;font-weight:700;cursor:pointer}
+    button.secondary{background:#f0f4f8;color:#0b1220;border:1px solid #e2e8f0}
+    .result{margin-top:14px;padding:12px;border-radius:6px;background:#eef2ff}
+    input[type="text"], input[type="email"]{padding:8px;border:1px solid #e2e8f0;border-radius:6px;width:100%}
+    .hint{font-size:13px;color:#64748b}
+    .small{font-size:13px;color:#334155}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Quiz Literário</h1>
+    <p class="hint">Preencha seu nome e email — as respostas serão gravadas no repositório GitHub (pasta <code>responses/</code>).</p>
+
+    <!-- CONFIGURAÇÃO: ajuste estes valores -->
+    <script>
+      // ======== CONFIGURE AQUI ========
+      const GITHUB_OWNER = 'noticias-24';                   // seu usuário/org
+      const GITHUB_REPO  = 'noticias-24.github.io';         // seu repo
+      const GITHUB_BRANCH = 'main';                         // branch alvo
+      const RESPONSES_FOLDER = 'responses';                 // pasta onde salvar
+      // ======== TOKEN ========
+      // Opção A: cole o token AQUI (NÃO recomendado para repo público)
+      const GITHUB_TOKEN_INLINE = ''; // se usar Opção A, cole o token entre as aspas
+
+      // Opção B (recomendada para testes): token será pedido com prompt() na primeira submissão.
+    </script>
+
+    <!-- Formulário com nome/email -->
+    <form id="quizForm">
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <div style="flex:1">
+          <label>Nome</label>
+          <input id="userName" type="text" placeholder="Seu nome completo">
+        </div>
+        <div style="flex:1">
+          <label>Email</label>
+          <input id="userEmail" type="email" placeholder="seu@email.com">
+        </div>
+      </div>
+
+      <!-- (Aqui entram as 7 perguntas - reutilizei as mesmas) -->
+      <div class="question" id="q1">
+        <strong>1) Qual é a sua atitude em relação ao desconhecido?</strong>
+        <label><input type="radio" name="q1" value="a"> a) Você é um aventureiro que adora explorar o desconhecido e descobrir segredos.</label>
+        <label><input type="radio" name="q1" value="b"> b) Você é cauteloso e prefere evitar o desconhecido até ter mais informações.</label>
+        <label><input type="radio" name="q1" value="c"> c) Você é pragmático e lida com o desconhecido de forma lógica e racional.</label>
+      </div>
+
+      <div class="question" id="q2">
+        <strong>2) Como você se sente em relação à complexidade?</strong>
+        <label><input type="radio" name="q2" value="a"> a) Você adora mergulhar em histórias complexas e detalhadas.</label>
+        <label><input type="radio" name="q2" value="b"> b) Você prefere histórias simples e diretas.</label>
+        <label><input type="radio" name="q2" value="c"> c) Você gosta de uma mistura de complexidade e simplicidade.</label>
+      </div>
+
+      <div class="question" id="q3">
+        <strong>3) Qual é o seu tom de humor favorito?</strong>
+        <label><input type="radio" name="q3" value="a"> a) Sarcasmo e ironia.</label>
+        <label><input type="radio" name="q3" value="b"> b) Humor absurdo e surreal.</label>
+        <label><input type="radio" name="q3" value="c"> c) Humor inteligente e espirituoso.</label>
+      </div>
+
+      <div class="question" id="q4">
+        <strong>4) Como você se sente em relação à introspecção?</strong>
+        <label><input type="radio" name="q4" value="a"> a) Adoro explorar pensamentos e sentimentos dos personagens.</label>
+        <label><input type="radio" name="q4" value="b"> b) Prefiro histórias de ação e aventura.</label>
+        <label><input type="radio" name="q4" value="c"> c) Gosto da mistura de introspecção e ação.</label>
+      </div>
+
+      <div class="question" id="q5">
+        <strong>5) Qual é a sua opinião sobre a moralidade?</strong>
+        <label><input type="radio" name="q5" value="a"> a) Moralidade é relativa.</label>
+        <label><input type="radio" name="q5" value="b"> b) Moralidade é absoluta.</label>
+        <label><input type="radio" name="q5" value="c"> c) Prefiro não julgar; deixo o leitor concluir.</label>
+      </div>
+
+      <div class="question" id="q6">
+        <strong>6) Qual o motivo principal da sua leitura?</strong>
+        <label><input type="radio" name="q6" value="a"> a) Para me conhecer.</label>
+        <label><input type="radio" name="q6" value="b"> b) Para sentir emoções.</label>
+        <label><input type="radio" name="q6" value="c"> c) Para fugir da realidade.</label>
+      </div>
+
+      <div class="question" id="q7">
+        <strong>7) Qual tema você mais gosta de ler sobre?</strong>
+        <label><input type="radio" name="q7" value="a"> a) Autoconhecimento.</label>
+        <label><input type="radio" name="q7" value="b"> b) Ficção / mundos mágicos.</label>
+        <label><input type="radio" name="q7" value="c"> c) Romance / histórias emocionais.</label>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="submitBtn">Enviar e gravar no GitHub</button>
+        <button type="button" id="resetBtn" class="secondary">Refazer</button>
+        <div class="small" style="margin-top:8px">Ao enviar, será criado um ficheiro JSON em <code>responses/</code> no repositório configurado.</div>
+      </div>
+
+      <div id="status" class="result" style="display:none"></div>
+    </form>
+  </main>
+
+<script>
+/* ---------- utilitários ---------- */
+function base64EncodeUnicode(str) {
+  // segura para unicode
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function nowFilename() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const t = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  const rand = Math.random().toString(36).slice(2,8);
+  return `${t}_${rand}.json`;
+}
+function showStatus(msg, ok=true) {
+  const el = document.getElementById('status');
+  el.style.display='block';
+  el.style.background = ok ? '#ecfdf5' : '#fff1f2';
+  el.innerHTML = msg;
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- coleta e lógica do quiz (mesma ideia anterior) ---------- */
+function collectAnswers() {
+  const data = {};
+  for (let i=1;i<=7;i++){
+    const radios = document.getElementsByName('q'+i);
+    let val = null;
+    for (const r of radios) if (r.checked) { val = r.value; break; }
+    data['q'+i] = val;
+  }
+  const name = document.getElementById('userName').value.trim();
+  const email = document.getElementById('userEmail').value.trim();
+  return { answers: data, name, email };
+}
+function validateAllAnswered(obj) {
+  const missing = [];
+  if (!obj.name) missing.push('Nome');
+  if (!obj.email) missing.push('Email');
+  Object.keys(obj.answers).forEach(k => { if (!obj.answers[k]) missing.push(k); });
+  return missing;
+}
+function tally(answers) {
+  const counts = {a:0,b:0,c:0};
+  Object.values(answers).forEach(v => { if (v && counts[v] !== undefined) counts[v]++; });
+  return counts;
+}
+function decideResult(counts) {
+  const max = Math.max(counts.a, counts.b, counts.c);
+  const winners = [];
+  if (counts.a === max) winners.push('a');
+  if (counts.b === max) winners.push('b');
+  if (counts.c === max) winners.push('c');
+  if (winners.length === 1) return winners[0];
+  if (winners.length === 2) return winners.sort().join('+');
+  return 'all';
+}
+
+/* ---------- map de resultados (igual ao anterior) ---------- */
+const RESULTS = {
+  a: { title:"Perfil: Introspectivo e analítico", genres:"Ficção filosófica, romance psicológico, literatura experimental" , books:['"O Processo" — Franz Kafka','"A Náusea" — Jean-Paul Sartre','"A Morte de Virgílio" — Hermann Broch'], authors:['Franz Kafka','Jean-Paul Sartre','Hermann Broch','Virginia Woolf','James Joyce'] },
+  b: { title:"Perfil: Aventureiro e dinâmico", genres:"Ficção de aventura, fantasia, ficção científica", books:['"O Senhor dos Anéis" — J.R.R. Tolkien','"A Fundação" — Isaac Asimov','"A Busca pelo Santo Graal" — T.H. White'], authors:['J.R.R. Tolkien','Isaac Asimov','George R.R. Martin','Neil Gaiman','Patrick Rothfuss'] },
+  c: { title:"Perfil: Romântico e emocional", genres:"Romance, ficção sentimental, literatura feminina", books:['"Orgulho e Preconceito" — Jane Austen','"A Dama das Camélias" — Alexandre Dumas Filho','"O Amor nos Tempos do Cólera" — Gabriel García Márquez'], authors:['Jane Austen','Alexandre Dumas Filho','Gabriel García Márquez','Nicholas Sparks','Colleen Hoover'] },
+  'a+b': { title:"Perfil: Introspectivo e aventureiro", genres:"Ficção de mistério, thriller psicológico", books:['"O Silêncio dos Inocentes" — Thomas Harris','"A Garota no Trem" — Paula Hawkins','"O Psicólogo" — John Katzenbach'], authors:['Thomas Harris','Paula Hawkins','John Katzenbach','Gillian Flynn','Tana French'] },
+  'a+c': { title:"Perfil: Introspectivo e romântico", genres:"Romance psicológico, ficção literária", books:['"A Morte de Virgílio" — Hermann Broch','"O Livro de Desassossego" — Fernando Pessoa','"A Casa da Memória" — Jonathan Safran Foer'], authors:['Hermann Broch','Fernando Pessoa','Jonathan Safran Foer','David Mitchell','Zadie Smith'] },
+  'b+c': { title:"Perfil: Aventureiro e romântico", genres:"Ficção de aventura romântica, fantasia romântica", books:['"O Nome do Vento" — Patrick Rothfuss','"A Era dos Impérios" — Eric Hobsbawm','"O Conde de Monte Cristo" — Alexandre Dumas'], authors:['Patrick Rothfuss','Eric Hobsbawm','Alexandre Dumas','Ken Follett','Sharon Kay Penman'] },
+  all: { title:"Perfil: Equilíbrio entre introspecção, aventura e romantismo", genres:"Mistura variada", books:['"O Processo" — Franz Kafka','"O Senhor dos Anéis" — J.R.R. Tolkien','"Orgulho e Preconceito" — Jane Austen'], authors:['Franz Kafka','J.R.R. Tolkien','Jane Austen','Isaac Asimov','Gabriel García Márquez'] }
+};
+
+/* ---------- função que cria ficheiro no GitHub via API ---------- */
+async function pushToGitHub(payload, token) {
+  // payload: objeto com name,email,answers,counts,result,ts
+  const owner = GITHUB_OWNER;
+  const repo  = GITHUB_REPO;
+  const branch = GITHUB_BRANCH;
+  const folder = RESPONSES_FOLDER.replace(/\/+$/,'');
+  const filename = nowFilename();
+  const path = `${folder}/${filename}`; // ex: responses/20250910_120000_ab12.json
+
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+  const content = base64EncodeUnicode(JSON.stringify(payload, null, 2));
+  const body = {
+    message: `Add quiz response: ${payload.result} (${payload.name || 'anon'})`,
+    content: content,
+    branch: branch
+  };
+
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`GitHub API error: ${resp.status} ${resp.statusText} — ${text}`);
+  }
+  const json = await resp.json();
+  return json;
+}
+
+/* ---------- evento de submit ---------- */
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const data = collectAnswers();
+  const missing = validateAllAnswered(data);
+  if (missing.length) {
+    alert('Por favor preencha: ' + missing.join(', '));
+    return;
+  }
+  const counts = tally(data.answers);
+  const resultKey = decideResult(counts);
+  const ts = new Date().toISOString();
+
+  const payload = {
+    name: data.name,
+    email: data.email,
+    answers: data.answers,
+    counts: counts,
+    result: resultKey,
+    timestamp: ts
+  };
+
+  showStatus('Gravando resposta no GitHub... Aguarde.');
+
+  try {
+    // pegar token: primeiro usa inline, se vazio pede via prompt
+    let token = GITHUB_TOKEN_INLINE && GITHUB_TOKEN_INLINE.trim() ? GITHUB_TOKEN_INLINE.trim() : null;
+    if (!token) {
+      token = prompt('Cole aqui seu GitHub Personal Access Token (será usado apenas nesta sessão). NÃO cole este token em repositório público.');
+      if (!token) { showStatus('Operação cancelada: token não fornecido.', false); return; }
+    }
+
+    const res = await pushToGitHub(payload, token);
+    showStatus('Resposta gravada com sucesso no GitHub! Commit: <code>' + (res.commit && res.commit.sha ? res.commit.sha : 'ok') + '</code>');
+  } catch (err) {
+    console.error(err);
+    showStatus('Erro ao salvar no GitHub: ' + err.message, false);
+    alert('Erro: ' + err.message + '\nVer console para mais detalhes.');
+  }
+});
+
+/* ---------- reset ---------- */
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('quizForm').reset();
+  document.getElementById('status').style.display='none';
+});
+</script>
+</body>
+</html>
